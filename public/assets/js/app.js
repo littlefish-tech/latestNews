@@ -1,3 +1,5 @@
+$(function() {
+
 // Grab the articles as a json
 $.getJSON("/articles", function(data) {
     // For each one
@@ -70,4 +72,4 @@ $.getJSON("/articles", function(data) {
     $("#titleinput").val("");
     $("#bodyinput").val("");
   });
-  
+});

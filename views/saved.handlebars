@@ -1,0 +1,23 @@
+   <div class = "container">
+   {{#each save}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-9">
+                        <a href="{{this.link}}">{{this.title}}</a>
+                    </div>
+                    <div class="col-md-3 text-right">
+                        <button class="btn btn-danger save-article">Saved!</button>
+                        <button class="btn btn-primary view-comment ml-1">Add or View Note</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 col-sm-0">
+                        <p>{{except}}</p>
+                    </div>
+                    <div class="col-md-4 col-sm-0"></div>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+        </div>

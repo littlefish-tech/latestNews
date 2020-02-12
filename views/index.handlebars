@@ -1,53 +1,15 @@
-<div class = "container">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">LatestNews</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Saves Articles</a>
-      </li>
-      
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Scrape New Articles</button>
-
+{{#each articles}}
+<div class = "row">
+<div class="card col-8" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{this.title}}</h5>
+    {{!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.
+    </p> --}}
+    <a href={{this.link}} class="card-link">Read More</a>
   </div>
-</nav>
 
-<div class="jumbotron jumbotron-fluid">
-  <div class="container">
-    <div class = "pageImg">
-    <h1 class="display-4">Save and Comment NEWS</h1>
-    <p class="lead">New York Time Edition</p>
-    </div>
-  </div>
+<div class = "saveBut col-4">
+<button type="button" class="btn btn-primary">Save</button>
 </div>
-
-<ul>
-  {{#each news}}
-    {{#unless save}}
-      {{> Article/news-block save=true}}
-    {{/unless}}
-  {{/each}}
-</ul>
-
-<ul>
-  {{#each news}}
-    {{> Article/newsDisplay-block}}
-  {{/each}}
-</ul>
 </div>
-{{!-- <h2>Cats that are sleepy!</h2>
-
-<ul>
-  {{#each cats}}
-    {{#if sleepy}}
-      {{> cats/cat-block sleep=false}}
-    {{/if}}
-  {{/each}}
-</ul> --}}
+{{/each}}

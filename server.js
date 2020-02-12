@@ -40,42 +40,62 @@ var exphbs = require("express-handlebars");
 app.engine("handlebars", exphbs({ defaultLayout: "main", layoutsDir: __dirname + '/views/layouts'}));
 app.set("view engine", "handlebars");
 
-app.get("/", function(req,res){
-	db.Article.find({"saved": false}).limit(20).exec(function(error,data){
-		var hbsObject = {
-			article: data
-		};
-		console.log(hbsObject);
-		res.render("index", hbsObject);
-	});
-});
+// app.get("/", function(req,res){
+	// db.Article.find({"saved": false}).limit(20).exec(function(error,data){
+	// 	var hbsObject = {
+	// 		article: data
+	// 	};
+		// console.log(hbsObject);
+		// res.render("index", hbsObject);
+  // });
+  
+//   res.render("index");
+// });
 
 
 // Routes
 // A GET route for scraping the echoJS website
+app.get("/", function (req, res) {
+  // res.render("index");
+
+  db.Article.find({})
+  .then(function (dbArticle) {
+      var hbObj = {
+          articles:dbArticle
+      }
+    // If we were able to successfully find Articles, send them back to the client
+    res.render("index", hbObj);
+  })
+  .catch(function (err) {
+    // If an error occurred, send it to the client
+    res.json(err);
+  });
+});
+
+
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
-  axios.get("https://www.nytimes.com/").then(function(response) {
+  axios.get("https://www.mercurynews.com/location/san-jose/").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
+ 
     // Now, we grab every h2 within an article tag, and do the following:
-    $("article a").each(function(i, element) {
+    $("article h5").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
       // Add the text and href of every link, and save them as properties of the result object
       result.title = $(this)
-        .children("h2")
+        .children("a")
         .text();
-      
-      // result.summary = $(this)
-      //   .children(".summary")
-      //   .text();
 
-      // result.link = $(this)
-      // .children("h2")
-      //   .children("a")
-      //   .attr("href");
+      // result.summary = $(this)
+      // .children("div").children("div")
+      // .text();
+
+      result.link = $(this)
+        .children("a")
+        .attr("href");
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)
@@ -91,7 +111,9 @@ app.get("/scrape", function(req, res) {
 
     // Send a message to the client
     res.send("Scrape Complete");
+    
   });
+  res.render("index")
 });
 
 // Route for getting all Articles from the db
@@ -107,6 +129,25 @@ app.get("/articles", function(req, res) {
       res.json(err);
     });
 });
+app.get("/saved", function(req,res){
+  // res.render("saved");
+
+  db.Article.find({
+      saved: true
+    })
+    .then(function (dbSaved) {
+      // If we were able to successfully find Articles, send them back to the client
+      var hbObj = {
+          save:dbSaved
+      }
+
+      res.render("saved", hbObj);
+    })
+    .catch(function (err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+})
 
 // Route for grabbing a specific Article by id, populate it with it's note
 app.get("/articles/:id", function(req, res) {
@@ -123,6 +164,20 @@ app.get("/articles/:id", function(req, res) {
       res.json(err);
     });
 });
+
+app.post("/articles/save/:id", function(req,res){
+	db.Article.findOneAndUpdate({ "_id": req.params.id}, {"saved": true})
+	.exec(function(err, doc){
+		if(err){
+			console.log(err);
+		}
+		else{
+			res.send(doc);
+		}
+	});
+});
+
+
 
 // Route for saving/updating an Article's associated Note
 app.post("/articles/:id", function(req, res) {

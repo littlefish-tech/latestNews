@@ -1,15 +1,6 @@
 $(function() {
 
-  // $("#scrape").on("click", function(){
-  //   $.ajax({
-  //     method: "GET",
-  //     url: "/",
-  //   }).done(function(data){
-  //     console.log(data)
-  //     window.location = "/"
-  //   })
-  // });
-  
+  $(".scrape").on("click", function(){
 
 $.getJSON("/articles", function(data) {
   // For each one
@@ -18,7 +9,7 @@ $.getJSON("/articles", function(data) {
     $("#articles").append("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].link + "</p>");
   }
 });
-
+  });
 
 // Whenever someone clicks a p tag
 $(document).on("click", ".view-comment", function() {

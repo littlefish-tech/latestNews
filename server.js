@@ -61,7 +61,7 @@ app.get("/", function (req, res) {
   db.Article.find({})
   .then(function (dbArticle) {
       var hbObj = {
-          articles:dbArticle
+          articles: dbArticle
       }
     // If we were able to successfully find Articles, send them back to the client
     res.render("index", hbObj);
@@ -73,7 +73,7 @@ app.get("/", function (req, res) {
 });
 
 
-app.get("/scrape", function(req, res) {
+app.get("/", function(req, res) {
   // First, we grab the body of the html with axios
   axios.get("https://www.mercurynews.com/location/san-jose/").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
@@ -86,7 +86,7 @@ app.get("/scrape", function(req, res) {
 
       // Add the text and href of every link, and save them as properties of the result object
       result.title = $(this)
-        .children("a")
+        .children("a").children("span")
         .text();
 
       // result.summary = $(this)
@@ -110,7 +110,7 @@ app.get("/scrape", function(req, res) {
     });
 
     // Send a message to the client
-    res.send("Scrape Complete");
+    // res.send("Scrape Complete");
     
   });
   res.render("index")
@@ -129,25 +129,19 @@ app.get("/articles", function(req, res) {
       res.json(err);
     });
 });
-app.get("/saved", function(req,res){
-  // res.render("saved");
-
-  db.Article.find({
-      saved: true
+app.get("/saved/:id", function(req, res) {
+  // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
+  db.Article.findOne({ _id: req.params.id })
+  
+    .then(function(dbArticle) {
+      // If we were able to successfully find an Article with the given id, send it back to the client
+      res.json(dbArticle);
     })
-    .then(function (dbSaved) {
-      // If we were able to successfully find Articles, send them back to the client
-      var hbObj = {
-          save:dbSaved
-      }
-
-      res.render("saved", hbObj);
-    })
-    .catch(function (err) {
+    .catch(function(err) {
       // If an error occurred, send it to the client
       res.json(err);
     });
-})
+});
 
 // Route for grabbing a specific Article by id, populate it with it's note
 app.get("/articles/:id", function(req, res) {
@@ -164,21 +158,6 @@ app.get("/articles/:id", function(req, res) {
       res.json(err);
     });
 });
-
-app.post("/articles/save/:id", function(req,res){
-	db.Article.findOneAndUpdate({ "_id": req.params.id}, {"saved": true})
-	.exec(function(err, doc){
-		if(err){
-			console.log(err);
-		}
-		else{
-			res.send(doc);
-		}
-	});
-});
-
-
-
 // Route for saving/updating an Article's associated Note
 app.post("/articles/:id", function(req, res) {
   // Create a new note and pass the req.body to the entry
